@@ -1,13 +1,34 @@
 # Case reproduction
 
-Build docker image:
+**Issue description:**
+
+Exporting a YOLO model fails when the current directory filesystem (where pnnx is downloaded) is different to the filesystem where `/usr/local/lib/` is located (where pnnx is moved to).
+
+
+## Setup Environment
+
+
+**Build docker image:**
+
 ```bash
 docker build . \
     -f Dockerfile \
     -t some_image_name
 ```
 
-Run docker image:
+**Versions:**
+
+```
+ultralytics==8.2.59
+torch==2.3.1
+```
+
+See all versions in [versions.txt](./versions.txt).
+
+## Issue Reproduction
+
+**Run YOLO export inside created container:**
+
 ```bash
 docker run --rm -v $(pwd):/workdir -w /workdir some_image_name /usr/local/bin/python -c 'from ultralytics import YOLO;
 YOLO("yolov8n-pose.pt", task="pose").export(
@@ -18,8 +39,8 @@ YOLO("yolov8n-pose.pt", task="pose").export(
 )'
 ```
 
+**Result:**
 
-Log:
 ```console
 $ docker run --rm -v $(pwd):/workdir -w /workdir some_image_name /usr/local/bin/python -c 'from ultralytics import YOLO;
 YOLO("yolov8n-pose.pt", task="pose").export(
@@ -88,3 +109,7 @@ NCNN: export failure ❌ 10.3s: [Errno 18] Invalid cross-device link: '/workdir/
     self._accessor.rename(self, target)
 OSError: [Errno 18] Invalid cross-device link: '/workdir/pnnx-20240715-linux/pnnx' -> '/usr/local/lib/python3.9/site-packages/ultralytics/pnnx'
 ```
+
+## Versions
+
+
