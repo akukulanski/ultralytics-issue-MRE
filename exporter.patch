@@ -1,0 +1,19 @@
+commit bbaebed8a9f45fa9af12d72858f82c08779ecc31
+Author: akukulanski <akukulanski@gmail.com>
+Date:   Thu Jul 18 11:01:06 2024 -0300
+
+    Fix exporter to support working in a different filesystem than the one of /usr
+
+diff --git a/ultralytics/engine/exporter.py b/ultralytics/engine/exporter.py
+index 47466e3..59eb1ae 100644
+--- a/ultralytics/engine/exporter.py
++++ b/ultralytics/engine/exporter.py
+@@ -563,7 +563,7 @@ class Exporter:
+                 LOGGER.warning(f"{prefix} WARNING ⚠️ PNNX GitHub assets not found: {e}, using default {asset}")
+             unzip_dir = safe_download(f"https://github.com/pnnx/pnnx/releases/download/{release}/{asset}", delete=True)
+             if check_is_path_safe(Path.cwd(), unzip_dir):  # avoid path traversal security vulnerability
+-                (unzip_dir / name).rename(pnnx)  # move binary to ROOT
++                shutil.move(src=unzip_dir / name, dst=pnnx)  # move binary to ROOT
+                 pnnx.chmod(0o777)  # set read, write, and execute permissions for everyone
+                 shutil.rmtree(unzip_dir)  # delete unzip dir
+ 
